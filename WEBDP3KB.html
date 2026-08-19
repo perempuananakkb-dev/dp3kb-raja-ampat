@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DP3AKB Kabupaten Raja Ampat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* ===== HEADER WAKTU REAL-TIME ===== */
+        #header-waktu {
+            background: #1a5276;
+            color: white;
+            padding: 8px 20px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #header-waktu span { display: inline-flex; align-items: center; gap: 8px; }
+        #jam-sekarang {
+            background: rgba(255,255,255,0.15);
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* ===== NAVIGASI + DROPDOWN SUBMENU ===== */
+        nav {
+            background: #2980b9;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .nav-brand {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 12px 0;
+        }
+        /* Tombol Hamburger (mobile) */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 10px;
+        }
+        .nav-menu > ul {
+            display: flex;
+        }
+        .nav-menu > ul > li {
+            position: relative;
+        }
+        .nav-menu > ul > li > a {
+            display: block;
+            color: white;
+            font-weight: 500;
+            padding: 18px 16px;
+        }
+        .nav-menu > ul > li > a:hover,
+        .nav-menu > ul > li:hover > a {
+            background: #1a5276;
+        }
+        /* Panah indikator submenu */
+        .has-submenu > a::after {
+            content: ' ▾';
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+        /* ===== SUBMENU (DROPDOWN) ===== */
+        .submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 230px;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            border-radius: 0 0 8px 8px;
+            border-top: 3px solid #e67e22;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.25s ease;
+        }
+        .has-submenu:hover .submenu,
+        .has-submenu:focus-within .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .submenu li a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            font-size: 0.92rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .submenu li:last-child a { border-bottom: none; }
+        .submenu li a:hover {
+            background: #ebf5fb;
+            color: #2980b9;
+            padding-left: 26px;
+        }
+        .submenu li a::before {
+            content: '› ';
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .hero img { max-width: 120px; margin-bottom: 20px; }
+        .hero h1 { font-size: 2rem; margin-bottom: 10px; }
+        .hero p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto 25px; }
+        .hero .btn {
+            display: inline-block;
+            background: #e67e22;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+        .hero .btn:hover { background: #d35400; transform: translateY(-2px); }
+
+        /* ===== MARQUEE ===== */
+        .marquee-container {
+            background: #f39c12;
+            color: white;
+            padding: 12px 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 30s linear infinite;
+            font-weight: 500;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100vw); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ===== SECTIONS ===== */
+        section { padding: 50px 20px; max-width: 1200px; margin: 0 auto; }
+        section h2 { text-align: center; color: #1a5276; margin-bottom: 40px; font-size: 1.8rem; position: relative; }
+        section h2::after {
+            content: ''; display: block; width: 60px; height: 3px;
+            background: #e67e22; margin: 10px auto 0; border-radius: 2px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+        .service-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            transition: 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .service-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: #2980b9; }
+        .service-card h3 { color: #2980b9; margin-bottom: 15px; font-size: 1.1rem; }
+        .service-card p { font-size: 0.9rem; color: #555; }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .info-card {
+            background: linear-gradient(135deg, #ebf5fb, #ffffff);
+            border-left: 4px solid #2980b9;
+            padding: 30px;
+            border-radius: 0 10px 10px 0;
+        }
+        .info-card h3 { color: #1a5276; margin-bottom: 15px; }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .news-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            transition: 0.3s;
+        }
+        .news-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
+        .news-date {
+            background: #e67e22;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .news-content { padding: 20px; }
+        .news-content h3 { color: #1a5276; margin-bottom: 10px; font-size: 1.1rem; }
+        .news-content p { font-size: 0.9rem; color: #666; margin-bottom: 15px; }
+        .news-content a { color: #2980b9; font-weight: bold; font-size: 0.9rem; }
+        .news-content a:hover { color: #e67e22; }
+
+        footer {
+            background: #1a5276;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 50px;
+        }
+        footer p { margin-bottom: 8px; font-size: 0.9rem; opacity: 0.9; }
+        footer .copyright { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.8rem; }
+
+        /* ===== RESPONSIVE MOBILE ===== */
+        @media (max-width: 900px) {
+            .hamburger { display: block; }
+            .nav-menu {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: #2980b9;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s ease;
+            }
+            .nav-menu.active { max-height: 1000px; overflow-y: auto; }
+            .nav-menu > ul { flex-direction: column; }
+            .nav-menu > ul > li > a { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
+            /* Submenu mobile: tampil saat kelas .open aktif */
+            .submenu {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                display: none;
+                background: #1a5276;
+                border-radius: 0;
+                border-top: none;
+                box-shadow: none;
+                min-width: 100%;
+            }
+            .has-submenu.open .submenu { display: block; }
+            .submenu li a {
+                color: #d6eaf8;
+                padding-left: 40px;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+            }
+            .submenu li a:hover {
+                background: rgba(255,255,255,0.1);
+                color: white;
+                padding-left: 46px;
+            }
+            .submenu li a::before { content: '• '; color: #f39c12; }
+
+            #header-waktu { flex-direction: column; gap: 5px; text-align: center; }
+            .hero h1 { font-size: 1.5rem; }
+        }
+
+        /* ===== HERO SECTION DENGAN BACKGROUND PIAINEMO ===== */
+.hero {
+    /* Gambar Kepulauan Piaynemo Raja Ampat */
+    background-image: linear-gradient(rgba(26, 82, 118, 0.75), rgba(41, 128, 185, 0.65)),
+                      url('https://images.unsplash.com/photo-1516690561799-46d8f74f9abf?q=80&w=1920&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center 40%; /* Fokus ke area pulau karst */
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* Efek parallax saat scroll */
+    
+    color: white;
+    text-align: center;
+    padding: 100px 20px; /* Padding lebih besar agar konten tidak tertutup */
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+
+
+/* Pastikan elemen anak tetap di atas overlay */
+.hero > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Responsif: Matikan parallax di mobile agar tidak lag */
+@media (max-width: 768px) {
+    .hero {
+        background-attachment: scroll;
+        padding: 60px 20px;
+        min-height: 400px;
+    }
+}
+            
+    </style>
+</head>
+<body>
+
+    <!-- HEADER WAKTU REAL-TIME -->
+    <div id="header-waktu">
+        <span>📅 <strong id="tanggal-lengkap">Memuat tanggal...</strong></span>
+        <span>🕐 <strong id="jam-sekarang">--:--:-- WIT</strong></span>
+    </div>
+
+    <!-- ===== NAVIGASI DENGAN SUBMENU ===== -->
+    <nav>
+        <div class="nav-container">
+            <div class="nav-brand">DP3AKB RAJA AMPAT</div>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Buka menu">☰</button>
+            <div class="nav-menu" id="navMenu">
+                <ul>
+                    <li><a href="#">Beranda</a></li>
+
+                    <!-- MENU PROFIL + SUBMENU -->
+                    <li class="has-submenu">
+                        <a href="#profil">Profil</a>
+                        <ul class="submenu">
+                            <li><a href="e:\DP3AKB\Visi & Misi.html">Visi & Misi</a></li>
+                            <li><a href="e:\DP3AKB\Profil.html">Profil Dinas</a></li>
+                            <li><a href="#">Struktur Organisasi</a></li>
+                            <li><a href="e:\DP3AKB\Tugas & Fungsi.html">Tugas & Fungsi</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- MENU BERITA + SUBMENU -->
+                    <li class="has-submenu">
+                        <a href="#berita">Berita</a>
+                        <ul class="submenu">
+                            <li><a href="e:\DP3AKB\Berita.html">Kegiatan</a></li>
+                            <li><a href="e:\DP3AKB\Info Perempuan.html">Info Perempuan</a></li>
+                            <li><a href="e:\DP3AKB\Informasi Anak.html">Info Anak</a></li>
+                            <li><a href="e:\DP3AKB\INformasi KB.html">Keluarga Berencana</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- MENU LAYANAN + SUBMENU -->
+                    <li class="has-submenu">
+                        <a href="#layanan">Layanan</a>
+                        <ul class="submenu">
+                            <li><a href="#">Pusat Pembelajaran Keluarga</a></li>
+                            <li><a href="e:\DP3AKB\Pelayanan & Pengaduan.html">Pelayanan Pengaduan</a></li>
+                            <li><a href="e:\DP3AKB\Data & Informasi.html">Data & Informasi</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- MENU DOKUMENTASI + SUBMENU -->
+                    <li class="has-submenu">
+                        <a href="#dokumentasi">Dokumentasi</a>
+                        <ul class="submenu">
+                            <li><a href="e:\DP3AKB\Galery.html">Galeri Foto</a></li>
+                            <li><a href="https://youtu.be/RxM6IHzX20w?si=978kIOAkh4kZy0dU">Video Kegiatan</a></li>
+                            <li><a href="#">Unduhan</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#kontak">Kontak</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/49/Lambang_Kabupaten_Raja_Ampat%2C_Papua_Barat.gif" alt="Lambang Raja Ampat">
+        <h1>DINAS PEMBERDAYAAN PEREMPUAN, PERLINDUNGAN ANAK DAN KB</h1>
+        <p>KABUPATEN RAJA AMPAT — PROVINSI PAPUA BARAT DAYA 2026</p>
+        <p>Pemberdayaan Perempuan berfokus pada pencapaian kesetaraan gender dan kemandirian ekonomi.</p>
+        <a href="#layanan" class="btn">Lihat Layanan Kami</a>
+    </div>
+
+    <!-- RUNNING TEXT -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            📢 SELAMAT DATANG DI WEBSITE RESMI DP3AKB KABUPATEN RAJA AMPAT 2026 &nbsp;&nbsp;|&nbsp;&nbsp;
+            👩 Wujudkan Kesetaraan Gender dan Pemberdayaan Perempuan di Tanah Papua &nbsp;&nbsp;|&nbsp;&nbsp;
+            👶 Stop Kekerasan Terhadap Anak, Mari Ciptakan Lingkungan Ramah Anak &nbsp;&nbsp;|&nbsp;&nbsp;
+            👨‍👩‍👧‍👦 Keluarga Berencana: Dua Anak Lebih Sehat, Keluarga Berkualitas Menuju Indonesia Emas 2045
+        </div>
+    </div>
+
+    <!-- FOKUS LAYANAN -->
+    <section id="layanan">
+        <h2>Fokus Layanan Kami</h2>
+        <p style="text-align:center; margin-bottom:30px; color:#666;">Bergerak bersama untuk kesejahteraan masyarakat Raja Ampat</p>
+        <div class="services-grid">
+            <div class="service-card">
+                <h3>🏛️ Bidang Peran Aktif Organisasi Perempuan</h3>
+                <p>Berperan penting sebagai motor penggerak peningkatan kualitas hidup, kesetaraan gender, dan keterlibatan strategis kaum perempuan dalam segala aspek pembangunan nasional.</p>
+            </div>
+            <div class="service-card">
+                <h3>🛡️ Bidang Perlindungan Perempuan</h3>
+                <p>Melindungi perempuan dan memperjuangkan hak-haknya agar merasa aman serta bebas dari segala bentuk kekerasan, diskriminasi, dan eksploitasi.</p>
+            </div>
+            <div class="service-card">
+                <h3>👶 Bidang Perlindungan Anak</h3>
+                <p>Segala kegiatan untuk menjamin dan melindungi anak dan hak-haknya agar dapat hidup, tumbuh, berkembang, dan berpartisipasi secara optimal serta mendapat perlindungan dari kekerasan.</p>
+            </div>
+            <div class="service-card">
+                <h3>👨‍👩‍👧‍👦 Keluarga Berencana & Sejahtera</h3>
+                <p>Upaya mengatur kelahiran anak, jarak dan usia ideal melahirkan, serta mewujudkan keluarga yang bertakwa, sejahtera materiil dan spiritual.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- INFORMASI PENTING -->
+    <section>
+        <h2>Informasi Penting</h2>
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>📉 Apa Itu Stunting?</h3>
+                <p>Stunting adalah kondisi gagal tumbuh pada anak balita akibat kekurangan gizi kronis dan infeksi berulang, terutama dalam 1000 Hari Pertama Kehidupan (HPK). Kondisi ini ditandai dengan panjang atau tinggi badan anak yang berada di bawah standar kurva pertumbuhan.</p>
+            </div>
+            <div class="info-card">
+                <h3>⚖️ Apa Itu Gender?</h3>
+                <p>Gender merujuk pada peran, perilaku, ekspresi, dan identitas yang dikonstruksikan secara sosial oleh masyarakat untuk membedakan antara laki-laki dan perempuan.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- BERITA TERKINI -->
+    <section id="berita">
+        <h2>Berita Terkini</h2>
+        <p style="text-align:center; margin-bottom:30px; color:#666;">Informasi terbaru seputar kegiatan DP3AKB Raja Ampat</p>
+        <div class="news-grid">
+            <div class="news-card">
+                <div class="news-date">12 Agustus 2026</div>
+                <div class="news-content">
+                    <h3>Sosialisasi Pencegahan Stunting di Waisai</h3>
+                    <p>DP3AKB menggelar sosialisasi pentingnya gizi seimbang bagi ibu hamil...</p>
+                    <a href="e:\DP3AKB\Pencegahan Stunting.html">Baca Selengkapnya →</a>
+                </div>
+            </div>
+            <div class="news-card">
+                <div class="news-date">10 Agustus 2026</div>
+                <div class="news-content">
+                    <h3>Pelatihan UMKM Perempuan Kepala Keluarga</h3>
+                    <p>Pemberian modal usaha dan pelatihan kerajinan tangan...</p>
+                    <a href="#">Baca Selengkapnya →</a>
+                </div>
+            </div>
+            <div class="news-card">
+                <div class="news-date">08 Agustus 2026</div>
+                <div class="news-content">
+                    <h3>Kampanye KB di Pulau Misool</h3>
+                    <p>Kunjungan kerja tim penyuluh KB ke wilayah kepulauan...</p>
+                    <a href="#">Baca Selengkapnya →</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="kontak">
+        <p><strong>DP3AKB KABUPATEN RAJA AMPAT</strong></p>
+        <p>Komp. Perkantoran Bupati Raja Ampat, Waisai, Papua Barat Daya, Indonesia</p>
+        <p>Email: dp3akb@rajaampatkab.go.id</p>
+        <div class="copyright">© 2026 DP3AKB Kabupaten Raja Ampat. All Rights Reserved.</div>
+    </footer>
+
+    <!-- ===== SCRIPT: JAM REAL-TIME + MENU MOBILE ===== -->
+    <script>
+    // --- Jam Real-Time WIT (Asia/Jayapura) ---
+    function updateWaktuDP3AKB() {
+        const sekarang = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jayapura" }));
+        const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+        const bulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+
+        const tanggalLengkap = hari[sekarang.getDay()] + ", " + sekarang.getDate() + " " +
+                               bulan[sekarang.getMonth()] + " " + sekarang.getFullYear();
+
+        let jam = sekarang.getHours(), menit = sekarang.getMinutes(), detik = sekarang.getSeconds();
+        jam   = (jam < 10) ? "0" + jam : jam;
+        menit = (menit < 10) ? "0" + menit : menit;
+        detik = (detik < 10) ? "0" + detik : detik;
+
+        document.getElementById("tanggal-lengkap").innerHTML = tanggalLengkap;
+        document.getElementById("jam-sekarang").innerHTML = jam + ":" + menit + ":" + detik + " WIT";
+    }
+    setInterval(updateWaktuDP3AKB, 1000);
+    updateWaktuDP3AKB();
+
+    // --- Hamburger Menu (Mobile) ---
+    const hamburgerBtn = document.getElementById("hamburgerBtn");
+    const navMenu = document.getElementById("navMenu");
+    hamburgerBtn.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+        hamburgerBtn.textContent = navMenu.classList.contains("active") ? "✕" : "☰";
+    });
+
+    // --- Toggle Submenu saat di Mobile (klik panah/menu parent) ---
+    document.querySelectorAll(".has-submenu > a").forEach(link => {
+        link.addEventListener("click", function (e) {
+            // Hanya aktif di layar mobile
+            if (window.innerWidth <= 900) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                // Tutup submenu lain yang sedang terbuka
+                document.querySelectorAll(".has-submenu.open").forEach(item => {
+                    if (item !== parent) item.classList.remove("open");
+                });
+                parent.classList.toggle("open");
+            }
+        });
+    });
+    </script>
+
+</body>
+</html>
